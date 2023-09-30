@@ -1,17 +1,18 @@
 import "express-async-errors";
 
-import database from "./database/sqlite/index.js";
+import migrationsRun from "./database/sqlite/migrations/index.js";
+// apaga a importação do sqliteconnection e importa as migrations
 
 import express from "express";
 import routes from "./routes/index.js";
 import AppError from "./utils/AppError.js";
 
+migrationsRun(); // executa a função migrations importada
+
 const app = express();
 app.use(express.json());
 
 app.use(routes);
-
-database();
 
 app.use((error, request, response, next) => {
   if (error instanceof AppError) {
