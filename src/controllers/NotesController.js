@@ -1,10 +1,11 @@
 import knex from "../database/knex/index.js";
+import AppError from "../utils/AppError.js";
 
 class NotesController {
   async create(request, response) {
     const { title, description, tags, links } = request.body;
 
-    const { user_id } = request.params;
+    const user_id = request.user.id;
 
     const [note_id] = await knex("notes").insert({
       title,
@@ -54,6 +55,12 @@ class NotesController {
 
   async delete(request, response) {
     const { id } = request.params;
+
+    const note = await knex("notes").where({ id }).first();
+    console.log(note);
+    if (!note) {
+      throw new AppError("Nota não existe");
+    }
 
     await knex("notes").where({ id }).delete();
 

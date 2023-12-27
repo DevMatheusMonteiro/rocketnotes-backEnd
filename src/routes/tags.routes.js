@@ -1,10 +1,13 @@
 import { Router } from "express";
 import TagsController from "../controllers/TagsController.js";
+import ensureAuthenticated from "../middlewares/ensureAuthenticated.js";
 
 const tagsRoutes = Router();
 
 const tagsController = new TagsController();
 
-tagsRoutes.get("/:user_id", tagsController.index);
+tagsRoutes.use(ensureAuthenticated);
+
+tagsRoutes.get("/", tagsController.index);
 
 export default tagsRoutes;
