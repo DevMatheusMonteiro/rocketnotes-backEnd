@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 
 export const TMP_FOLDER = path.resolve(__dirname, "..", "..", "tmp");
 
-export const UPLOADS_FOLDER = path.resolve(__dirname, "uploads");
+export const UPLOADS_FOLDER = path.resolve(TMP_FOLDER, "uploads");
 
 export const MULTER = {
   storage: multer.diskStorage({
