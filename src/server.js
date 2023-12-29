@@ -3,12 +3,14 @@ import "express-async-errors";
 import migrationsRun from "./database/sqlite/migrations/index.js";
 
 import express from "express";
+import cors from "cors";
 import routes from "./routes/index.js";
 import AppError from "./utils/AppError.js";
 import * as uploadConfig from "./configs/upload.js";
 
 migrationsRun();
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 app.use("/files", express.static(uploadConfig.UPLOADS_FOLDER));
