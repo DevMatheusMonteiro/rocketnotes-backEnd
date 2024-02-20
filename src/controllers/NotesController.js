@@ -13,24 +13,28 @@ class NotesController {
       user_id,
     });
 
-    const linksInsert = links.map((link) => {
-      return {
-        note_id,
-        url: link,
-      };
-    });
+    if (links.length > 0) {
+      const linksInsert = links.map((link) => {
+        return {
+          note_id,
+          url: link,
+        };
+      });
 
-    await knex("links").insert(linksInsert);
+      await knex("links").insert(linksInsert);
+    }
 
-    const tagsInsert = tags.map((tag) => {
-      return {
-        note_id,
-        name: tag,
-        user_id,
-      };
-    });
+    if (tags.length > 0) {
+      const tagsInsert = tags.map((tag) => {
+        return {
+          note_id,
+          name: tag,
+          user_id,
+        };
+      });
 
-    await knex("tags").insert(tagsInsert);
+      await knex("tags").insert(tagsInsert);
+    }
 
     return response.status(201).json();
   }
@@ -39,6 +43,10 @@ class NotesController {
     const { id } = request.params;
 
     const note = await knex("notes").where({ id }).first();
+
+    if (!note) {
+      throw new AppError("Nota não encontrada", 404);
+    }
 
     const tags = await knex("tags").where({ note_id: id }).orderBy("name");
 
@@ -56,11 +64,7 @@ class NotesController {
   async delete(request, response) {
     const { id } = request.params;
 
-    const note = await knex("notes").where({ id }).first();
-    console.log(note);
-    if (!note) {
-      throw new AppError("Nota não existe");
-    }
+    await knex("notes").where({ id }).first();
 
     await knex("notes").where({ id }).delete();
 
@@ -68,7 +72,9 @@ class NotesController {
   }
 
   async index(request, response) {
-    const { user_id, title, tags } = request.query;
+    const user_id = request.user.id;
+
+    const { title, tags } = request.query;
 
     let notes;
 

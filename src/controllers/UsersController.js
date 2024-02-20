@@ -3,6 +3,21 @@ import sqliteConnection from "../database/sqlite/index.js";
 import bcryptjs from "bcryptjs";
 
 class UsersController {
+  async show(request, response) {
+    const user_id = request.user.id;
+
+    const database = await sqliteConnection();
+    const user = await database.get("SELECT * FROM users WHERE id = (?)", [
+      user_id,
+    ]);
+
+    if (!user) {
+      throw new AppError("Usuário não encontrado!");
+    }
+
+    return response.status(200).json(user);
+  }
+
   async create(request, response) {
     const { name, email, password } = request.body;
 
@@ -44,10 +59,6 @@ class UsersController {
       throw new AppError("Usuário não encontrado!");
     }
 
-    if (!name && !email && !password && !old_password) {
-      throw new AppError("Nenhum valor informado para ser atualizado");
-    }
-
     const userWithUpdatedEmail = await database.get(
       "SELECT * FROM users WHERE email = (?)",
       [email]
@@ -86,7 +97,12 @@ class UsersController {
       [user.name, user.email, user.password, user_id]
     );
 
-    return response.status(200).json();
+    const updatedUser = await database.get(
+      "SELECT * FROM users WHERE id = (?)",
+      [user_id]
+    );
+
+    return response.status(200).json({ user: updatedUser });
   }
 }
 
